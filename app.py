@@ -1,23 +1,10 @@
 import os
-from flask import Flask, request, jsonify, render_template
 import streamlit as st
 import openai
-
-app = Flask(__name__)
 
 # 환경 변수에서 OpenAI API 키 가져오기
 api_key = os.getenv("sk-proj-wVp9aECsCkSoiSBDl8gOT3BlbkFJsyY6UYtFTe64ex7GNwB2")
 openai.api_key = api_key
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-@app.route('/chat', methods=['POST'])
-def chat():
-    user_input = request.json.get('message')
-    response = generate_response(user_input)
-    return jsonify({'response': response})
 
 def generate_response(user_input):
     messages = [
@@ -34,5 +21,10 @@ def generate_response(user_input):
     message = response.choices[0].message['content'].strip()
     return message
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# Streamlit UI
+st.title('아이리칸나 Chatbot')
+user_input = st.text_input("You: ", "Hello!")
+
+if st.button('Send'):
+    response = generate_response(user_input)
+    st.write(f"아이리칸나: {response}")
