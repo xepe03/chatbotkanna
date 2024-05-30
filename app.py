@@ -3,8 +3,11 @@ import streamlit as st
 import openai
 
 # 환경 변수에서 OpenAI API 키 가져오기
-api_key = os.getenv("sk-proj-wVp9aECsCkSoiSBDl8gOT3BlbkFJsyY6UYtFTe64ex7GNwB2")
-openai.api_key = api_key
+api_key = os.getenv("OPENAI_API_KEY")
+if api_key is None:
+    st.error("OPENAI_API_KEY is not set in the environment variables.")
+else:
+    openai.api_key = api_key
 
 def generate_response(user_input):
     messages = [
@@ -26,5 +29,8 @@ st.title('아이리칸나 Chatbot')
 user_input = st.text_input("You: ", "Hello!")
 
 if st.button('Send'):
-    response = generate_response(user_input)
-    st.write(f"아이리칸나: {response}")
+    if api_key is None:
+        st.error("API key not found. Please set the OPENAI_API_KEY environment variable.")
+    else:
+        response = generate_response(user_input)
+        st.write(f"아이리칸나: {response}")
