@@ -1,12 +1,12 @@
 import os
 from flask import Flask, request, jsonify, render_template
-from openai import OpenAI
+import openai
 
 app = Flask(__name__)
 
 # 환경 변수에서 OpenAI API 키 가져오기
 api_key = os.getenv("sk-proj-wVp9aECsCkSoiSBDl8gOT3BlbkFJsyY6UYtFTe64ex7GNwB2")
-client = OpenAI(api_key=api_key)
+client = openai(api_key=api_key)
 
 @app.route('/')
 def home():
