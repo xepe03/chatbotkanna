@@ -1,24 +1,13 @@
 import os
-
-from flask import Flask, request, jsonify, render_template
 import streamlit as st
-from openai import OpenAI
-
-app = Flask(__name__)
+import openai
 
 # 환경 변수에서 OpenAI API 키 가져오기
 api_key = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key=api_key)
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-@app.route('/chat', methods=['POST'])
-def chat():
-    user_input = request.json.get('message')
-    response = generate_response(user_input)
-    return jsonify({'response': response})
+if api_key is None:
+    st.error("OPENAI_API_KEY is not set in the environment variables.")
+else:
+    openai.api_key = api_key
 
 def generate_response(user_input):
     messages = [
@@ -26,14 +15,23 @@ def generate_response(user_input):
         {"role": "user", "content": user_input}
     ]
     
-    response = client.chat.completions.create(
+    response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=messages,
         max_tokens=150,
         temperature=0.7,
     )
-    message = response.choices[0].message.content.strip()
+    message = response.choices[0].message['content'].strip()
     return message
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# Streamlit UI
+st.title('아이리칸나 Chatbot')
+user_input = st.text_input("You: ", "Hello!")
+
+if st.button('Send'):
+    if api_key is None:
+        st.error("API key not found. Please set the OPENAI_API_KEY environment variable.")
+    else:
+        response = generate_response(user_input)
+        st.write(f"아이리칸나: {response}")
+
